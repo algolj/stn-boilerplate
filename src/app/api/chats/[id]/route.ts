@@ -1,17 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import dayjs from 'dayjs';
 import { getChatById } from '@/lib/api/db';
-
-interface Params {
-  params: {
-    id: string;
-  };
-}
+import { withSessionHandler } from '@/modules/auth/server/with-session-handler';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = async (_: NextRequest, { params }: Params): Promise<NextResponse> => {
-  const chat = await getChatById(params.id, {
+export const GET = withSessionHandler(async ({ context }): Promise<NextResponse> => {
+  const chat = await getChatById(context?.params.id || '', {
     messages: {
       include: {
         author: {
@@ -39,4 +34,4 @@ export const GET = async (_: NextRequest, { params }: Params): Promise<NextRespo
   };
 
   return NextResponse.json(normalizedChat);
-};
+});
